@@ -1,0 +1,39 @@
+package com.example.foodapp.model.database
+
+import androidx.room.*
+import com.example.foodapp.model.entities.FavDish
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface FavDishDao {
+
+    @Insert
+    suspend fun insertFavDishDetails(favDish: FavDish)
+    /**
+     * When data changes, you usually want to take some action, such as displaying the updated data in the UI.
+     * This means you have to observe the data so when it changes, you can react.
+     *
+     * To observe data changes we will use Flow from kotlinx-coroutines.
+     * Use a return value of type Flow in your method description,
+     * and Room generates all necessary code to update the Flow when the database is updated.
+     *
+     * A Flow is an async sequence of values
+     * Flow produces values one at a time (instead of all at once) that can generate values from async operations
+     * like network requests, database calls, or other async code.
+     * It supports coroutines throughout its API, so you can transform a flow using coroutines as well!
+     */
+    @Query("SELECT * FROM FAV_DISHES_TABLE ORDER BY ID")
+    fun getAllDishesList(): Flow<List<FavDish>>
+
+    @Update
+    suspend fun updateFavDishDetails(favDish: FavDish)
+
+    @Query("SELECT * FROM FAV_DISHES_TABLE WHERE favorite_dish = 1")
+    fun getFavoriteDishesList(): Flow<List<FavDish>>
+
+    @Delete
+    suspend fun deleteFavDishDetails(favDish: FavDish)
+
+    @Query("SELECT * FROM FAV_DISHES_TABLE WHERE type = :filterType")
+    fun getFilteredDishesList(filterType: String): Flow<List<FavDish>>
+}
